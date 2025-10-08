@@ -23,7 +23,8 @@ local function open_hover_window(text_or_lines, title, callback)
   end
   local bufid = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(bufid, 0, -1, false, lines)
-  local winid = vim.api.nvim_open_win(bufid, true, {title = title, relative = "cursor", row = 1, col = 0, width = max_cols, height = math.min(16, #lines), style = "minimal"})
+  local win_opts = {title = title, relative = "cursor", row = 1, col = 0, width = max_cols, height = math.min(16, #lines), style = "minimal"}
+  local winid = vim.api.nvim_open_win(bufid, true, win_opts)
   disable_diagnostic(bufid)
   vim.bo[bufid]["readonly"] = true
   vim.bo[bufid]["modifiable"] = false
@@ -81,12 +82,14 @@ local function create_autocmd(item)
   local name = item["name"]
   local event = item["event"]
   local pattern = item["pattern"]
+  local opts
   local function _10_(_9_)
     local bufid = _9_["buf"]
     add_keymap(item, bufid)
     return nil
   end
-  return vim.api.nvim_create_autocmd(event, {desc = name, pattern = pattern, callback = _10_})
+  opts = {desc = name, pattern = pattern, callback = _10_}
+  return vim.api.nvim_create_autocmd(event, opts)
 end
 local M = {}
 M.setup = function(config)

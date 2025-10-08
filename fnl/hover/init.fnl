@@ -17,14 +17,14 @@
   (local bufid (vim.api.nvim_create_buf false true))
   (vim.api.nvim_buf_set_lines bufid 0 -1 false lines)
   ;; open float window to attach buffer
-  (local winid (vim.api.nvim_open_win bufid true
-                                      {:title title
-                                       :relative :cursor
-                                       :row 1
-                                       :col 0
-                                       :width max_cols
-                                       :height (math.min 16 (length lines))
-                                       :style :minimal}))
+  (local win_opts {:title title
+                   :relative :cursor
+                   :row 1
+                   :col 0
+                   :width max_cols
+                   :height (math.min 16 (length lines))
+                   :style :minimal})
+  (local winid (vim.api.nvim_open_win bufid true win_opts))
   ;; set some local options of buffer and window
   (disable_diagnostic bufid)
   (tset vim.bo bufid :readonly true)
@@ -80,12 +80,12 @@
 
 (fn create_autocmd [item]
   (local {: name : event : pattern} item)
-  (vim.api.nvim_create_autocmd event
-                               {:desc name
-                                :pattern pattern
-                                :callback (fn [{:buf bufid}]
-                                            (add_keymap item bufid)
-                                            nil)}))
+  (local opts {:desc name
+               :pattern pattern
+               :callback (fn [{:buf bufid}]
+                           (add_keymap item bufid)
+                           nil)})
+  (vim.api.nvim_create_autocmd event opts))
 
 (local M {})
 
